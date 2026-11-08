@@ -10,10 +10,17 @@ where the other players are by drawing their **faces** on the screen.
 - While a player is **not in view**, their face sticks to the **edge of the screen** in the direction you have to turn
   to look at them. Players behind you show up at the side you would turn to.
 - Players **close by** get no icon, you can see them anyway. Beyond a configurable distance the icon **fades in**.
-- The player's **name** and **distance** in blocks are shown below the face.
+- The player's **name** and **distance** in blocks are shown below the face. Face and text can be switched off and
+  resized separately.
 - The **toggle key** (`J` by default) shows and hides the icons. The new state is shown above the hotbar.
 - Spectators and invisible players are only shown to spectators, like in vanilla. The icons are hidden with the HUD
   (F1).
+
+| Faces float above the players in view | Close by, the icon fades out |
+|---|---|
+| ![Faces with names and distances above players in the distance](media/floating-faces.gif) | ![A player walks up to the camera and its icon fades out](media/fade-out.gif) |
+| **Out of view, the faces wait at the edge of the screen** | **The toggle key hides and shows them** |
+| ![The camera turns around while the faces stay at the edge of the screen](media/screen-edge.gif) | ![The toggle key hides the icons and shows them again](media/toggle.gif) |
 
 ## Installation
 
@@ -21,7 +28,10 @@ The mod is needed on the **client**. On the **server** it is optional:
 
 - **Client only:** players are shown as long as your client knows them, i.e. within the server's render distance.
 - **Client and server:** the server sends every player with the mod the positions of all other players in the same
-  dimension twice per second, so they are shown **at any distance**. Players without the mod can still join.
+  dimension twice per second, so they are shown **at any distance**.
+
+Players without the mod can join a server with it, they just see no icons themselves; they are still shown to the
+players with the mod.
 
 Singleplayer worlds opened to LAN run the server side as well.
 
@@ -37,12 +47,14 @@ its default, one at a time or all at once.
 | Key              | Default | Description                                                                                                                                  |
 |------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | `visible`        | `true`  | Show the icons when the game starts. Changing the value shows or hides them immediately.                                                     |
-| `iconSize`       | `12`    | Size of a face in GUI pixels (a hotbar slot is 20). `4` to `64`.                                                                             |
+| `showFace`       | `true`  | Show the player's face. Without it only the text is shown, where the face would be.                                                         |
+| `faceSize`       | `12`    | Size of a face in GUI pixels (a hotbar slot is 20). `4` to `64`.                                                                             |
+| `showNames`      | `true`  | Show the player's name below the face.                                                                                                       |
+| `showDistance`   | `true`  | Show the distance in blocks below the face. Without name and distance there is no text.                                                      |
+| `textScale`      | `0.75`  | Size of the text, `1.0` is the size of chat text. `0.25` to `4`.                                                                             |
 | `hideDistance`   | `8.0`   | Players closer than this many blocks get no icon. `0` to `1024`.                                                                              |
 | `fadeDistance`   | `8.0`   | Beyond `hideDistance` the icon fades in over this many blocks; `0` = it appears at once. `0` to `256`.                                       |
 | `opacity`        | `1.0`   | Opacity of fully visible icons. `0.05` to `1`.                                                                                               |
-| `showNames`      | `true`  | Show the player's name below the face.                                                                                                       |
-| `showDistance`   | `true`  | Show the distance in blocks below the face.                                                                                                  |
 | `sharePositions` | `true`  | Server: send the players with the mod the positions of all other players in their dimension, so they are shown at any distance.             |
 
 The **toggle key** is changed in Minecraft's own key binds: *Options → Controls → Key Binds → Multiplayer* ("Toggle
