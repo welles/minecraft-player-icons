@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Shows the faces of the other players on the server floating where they are, or at the edge of the screen pointing the way to them. Toggle with a key, fades out up close.",
+  "icon": "assets/${id}/icon.png",
+  "authors": [
+    "Nico Welles"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.welles.playericons.PlayerIconsFabric"
+    ],
+    "client": [
+      "dev.welles.playericons.PlayerIconsFabricClient"
+    ],
+    "modmenu": [
+      "dev.welles.playericons.PlayerIconsModMenu"
+    ]
+  },
+  "mixins": [
+    "playericons.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft}"
+  }
+}

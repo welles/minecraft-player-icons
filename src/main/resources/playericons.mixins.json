@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "dev.welles.playericons.mixin",
+  "compatibilityLevel": "${java}",
+  "mixins": [${mixins}],
+  "client": [${clientMixins}],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
