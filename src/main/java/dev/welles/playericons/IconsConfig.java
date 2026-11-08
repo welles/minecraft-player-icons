@@ -19,7 +19,8 @@ import java.util.Properties;
 public final class IconsConfig {
     /** The allowed values of each number setting; values outside are clamped. */
     public static final Map<String, Range> RANGES = Map.of(
-        "iconSize", new Range(4, 64),
+        "faceSize", new Range(4, 64),
+        "textScale", new Range(0.25, 4),
         "hideDistance", new Range(0, 1024),
         "fadeDistance", new Range(0, 256),
         "opacity", new Range(0.05, 1)
@@ -28,12 +29,14 @@ public final class IconsConfig {
     public static final Map<String, List<String>> CHOICES = Map.of();
 
     public boolean visible = true;
-    public int iconSize = 12;
+    public boolean showFace = true;
+    public int faceSize = 12;
+    public boolean showNames = true;
+    public boolean showDistance = true;
+    public double textScale = 0.75;
     public double hideDistance = 8.0;
     public double fadeDistance = 8.0;
     public double opacity = 1.0;
-    public boolean showNames = true;
-    public boolean showDistance = true;
     public boolean sharePositions = true;
 
     private static final String HEADER = """
@@ -44,12 +47,14 @@ public final class IconsConfig {
 
         visible         true = show the icons when the game starts. The toggle key shows and hides them while playing.
                         Changing this value shows or hides them immediately.
-        iconSize        Size of a face in GUI pixels (the size of a hotbar slot is 20). 4 to 64.
+        showFace        true = show the player's face. false = only the text, where the face would be.
+        faceSize        Size of a face in GUI pixels (the size of a hotbar slot is 20). 4 to 64.
+        showNames       true = show the player's name below the face
+        showDistance    true = show the distance in blocks below the face. Without name and distance there is no text.
+        textScale       Size of the text, 1.0 = the size of chat text. 0.25 to 4.
         hideDistance    Players closer than this many blocks get no icon, you can see them anyway. 0 to 1024.
         fadeDistance    Beyond hideDistance the icon fades in over this many blocks; 0 = it appears at once. 0 to 256.
         opacity         Opacity of fully visible icons, 1.0 = opaque. 0.05 to 1.
-        showNames       true = show the player's name below the face
-        showDistance    true = show the distance in blocks below the face
         sharePositions  true = the server sends every player with the mod the positions of all other players in the
                         same dimension, so they are shown at any distance. false = only players within the render
                         distance are shown. Only used on the server (and in singleplayer, i.e. LAN worlds).""";
@@ -114,12 +119,14 @@ public final class IconsConfig {
     /** Applies all valid values present in {@code props}; returns whether every key was present. */
     private boolean read(Properties props) {
         visible = readBoolean(props, "visible", visible);
-        iconSize = (int) Math.round(readNumber(props, "iconSize", iconSize, true));
+        showFace = readBoolean(props, "showFace", showFace);
+        faceSize = (int) Math.round(readNumber(props, "faceSize", faceSize, true));
+        showNames = readBoolean(props, "showNames", showNames);
+        showDistance = readBoolean(props, "showDistance", showDistance);
+        textScale = readNumber(props, "textScale", textScale, false);
         hideDistance = readNumber(props, "hideDistance", hideDistance, false);
         fadeDistance = readNumber(props, "fadeDistance", fadeDistance, false);
         opacity = readNumber(props, "opacity", opacity, false);
-        showNames = readBoolean(props, "showNames", showNames);
-        showDistance = readBoolean(props, "showDistance", showDistance);
         sharePositions = readBoolean(props, "sharePositions", sharePositions);
         return props.keySet().containsAll(toProperties().keySet());
     }
@@ -159,12 +166,14 @@ public final class IconsConfig {
     private Map<String, String> toProperties() {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("visible", String.valueOf(visible));
-        props.put("iconSize", String.valueOf(iconSize));
+        props.put("showFace", String.valueOf(showFace));
+        props.put("faceSize", String.valueOf(faceSize));
+        props.put("showNames", String.valueOf(showNames));
+        props.put("showDistance", String.valueOf(showDistance));
+        props.put("textScale", String.valueOf(textScale));
         props.put("hideDistance", String.valueOf(hideDistance));
         props.put("fadeDistance", String.valueOf(fadeDistance));
         props.put("opacity", String.valueOf(opacity));
-        props.put("showNames", String.valueOf(showNames));
-        props.put("showDistance", String.valueOf(showDistance));
         props.put("sharePositions", String.valueOf(sharePositions));
         return props;
     }

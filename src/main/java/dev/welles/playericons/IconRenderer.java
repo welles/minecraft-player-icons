@@ -41,9 +41,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 public final class IconRenderer {
     /** GUI pixels between the icons and the edge of the screen. */
     private static final float EDGE_MARGIN = 4;
-    private static final float LABEL_SCALE = 0.75F;
+    /** GUI pixels between the face and the label below it. */
+    private static final float LABEL_GAP = 1;
     /** The icon floats this far above the player's head, in blocks. */
-    private static final double HEAD_GAP = 0.5;
+    private static final double HEAD_GAP = 0.3;
     /** Height of a standing player, for players the client only knows from the server. */
     private static final double PLAYER_HEIGHT = 1.8;
     /** Icons fainter than this are not drawn. */
@@ -95,14 +96,21 @@ public final class IconRenderer {
         float focal = (float) (height / 2 / Math.tan(Math.toRadians(fov) / 2));
 
         Font font = minecraft.font;
-        int size = config.iconSize;
+        boolean face = config.showFace;
         boolean labels = config.showNames || config.showDistance;
-        float labelHeight = labels ? font.lineHeight * LABEL_SCALE + 1 : 0;
-        // the area for the centers of the icons, so icon and label stay on the screen
+        if (!face && !labels) return;
+        int size = face ? config.faceSize : 0;
+        float textScale = (float) config.textScale;
+        float labelHeight = labels ? font.lineHeight * textScale : 0;
+        // How far the icon reaches above and below its center: the face with the label below it, or the label alone,
+        // centered where the face would be
+        float above = face ? size / 2F : labelHeight / 2;
+        float below = face ? size / 2F + (labels ? labelHeight + LABEL_GAP : 0) : labelHeight / 2;
+        // the area for the centers of the icons, so face and label stay on the screen; labels move inwards themselves
         float left = EDGE_MARGIN + size / 2F;
         float right = width - EDGE_MARGIN - size / 2F;
-        float top = EDGE_MARGIN + size / 2F;
-        float bottom = height - EDGE_MARGIN - size / 2F - labelHeight;
+        float top = EDGE_MARGIN + above;
+        float bottom = height - EDGE_MARGIN - below;
         float centerX = width / 2;
         float centerY = height / 2;
         if (left >= right || top >= bottom) return;
@@ -125,7 +133,8 @@ public final class IconRenderer {
             boolean inView = false;
             if (depth > 0.01F) {
                 x = centerX + view.x / depth * focal;
-                y = centerY - view.y / depth * focal;
+                // face and label stand on the point above the head, so they do not cover the player
+                y = centerY - view.y / depth * focal - below;
                 inView = x >= left && x <= right && y >= top && y <= bottom;
             }
             if (!inView) {
@@ -143,8 +152,9 @@ public final class IconRenderer {
                 y = centerY + dy * scale;
             }
 
-            drawFace(graphics, info, x - size / 2F, y - size / 2F, size, alpha);
-            if (labels) drawLabel(graphics, font, label(target, config), x, y + size / 2F + 1, alpha, width);
+            if (face) drawFace(graphics, info, x - size / 2F, y - size / 2F, size, alpha);
+            float labelY = face ? y + size / 2F + LABEL_GAP : y - labelHeight / 2;
+            if (labels) drawLabel(graphics, font, label(target, config), x, labelY, textScale, alpha, width);
         }
     }
 
@@ -196,13 +206,13 @@ public final class IconRenderer {
         graphics.pose().popMatrix();
     }
 
-    private static void drawLabel(GuiGraphicsExtractor graphics, Font font, String text, float x, float y, float alpha, float screenWidth) {
+    private static void drawLabel(GuiGraphicsExtractor graphics, Font font, String text, float x, float y, float scale, float alpha, float screenWidth) {
         Component label = Component.literal(text);
-        float halfWidth = font.width(label) * LABEL_SCALE / 2;
+        float halfWidth = font.width(label) * scale / 2;
         x = Math.clamp(x, halfWidth + 1, Math.max(halfWidth + 1, screenWidth - halfWidth - 1));
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
-        graphics.pose().scale(LABEL_SCALE, LABEL_SCALE);
+        graphics.pose().scale(scale, scale);
         graphics.text(font, label, -font.width(label) / 2, 0, color(alpha), true);
         graphics.pose().popMatrix();
     }
@@ -230,20 +240,20 @@ public final class IconRenderer {
         //?}
     }
 
-    private static void drawLabel(GuiGraphics graphics, Font font, String text, float x, float y, float alpha, float screenWidth) {
+    private static void drawLabel(GuiGraphics graphics, Font font, String text, float x, float y, float scale, float alpha, float screenWidth) {
         Component label = Component.literal(text);
-        float halfWidth = font.width(label) * LABEL_SCALE / 2;
+        float halfWidth = font.width(label) * scale / 2;
         x = Math.clamp(x, halfWidth + 1, Math.max(halfWidth + 1, screenWidth - halfWidth - 1));
         //? if >=1.21.6 {
         /*graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
-        graphics.pose().scale(LABEL_SCALE, LABEL_SCALE);
+        graphics.pose().scale(scale, scale);
         graphics.drawString(font, label, -font.width(label) / 2, 0, color(alpha), true);
         graphics.pose().popMatrix();
         *///?} else {
         graphics.pose().pushPose();
         graphics.pose().translate(x, y, 0);
-        graphics.pose().scale(LABEL_SCALE, LABEL_SCALE, 1);
+        graphics.pose().scale(scale, scale, 1);
         graphics.drawString(font, label, -font.width(label) / 2, 0, color(alpha), true);
         graphics.pose().popPose();
         //?}
