@@ -44,6 +44,11 @@ public class PlayerIconsRecordings implements FabricClientGameTest {
     private static final int HEIGHT = 480;
     /** The flat world's surface, where the players stand. */
     private static final int GROUND = -60;
+    /** Blocks between the grid lines on the floor; the camera stands in the middle between two of them. */
+    private static final int GRID = 12;
+    /** The colored pillars on the horizon stand in a ring this far away, behind all players, and are this high. */
+    private static final int PILLAR_RADIUS = 48;
+    private static final int PILLAR_HEIGHT = 7;
     /** Blocks per tick of a walking player. */
     private static final double WALK_SPEED = 0.215;
 
@@ -67,6 +72,7 @@ public class PlayerIconsRecordings implements FabricClientGameTest {
                         x, GROUND - 1, z, x + 63, GROUND - 1, z + 63));
                 }
             }
+            landmarks(server);
             server.runCommand(String.format(Locale.ROOT, "tp @a 0.5 %d 0.5 0 0", GROUND));
             singleplayer.getClientWorld().waitForChunksRender();
 
@@ -75,6 +81,27 @@ public class PlayerIconsRecordings implements FabricClientGameTest {
             fadeOut(context, server);
             screenEdge(context, server);
             toggle(context, server);
+        }
+    }
+
+    /**
+     * Something to see the camera move against, with large plain areas that keep the GIFs small: grid lines on the
+     * floor every few blocks and a ring of colored pillars on the horizon, behind the players.
+     */
+    private static void landmarks(TestServerContext server) {
+        for (int line = -GRID / 2 - 4 * GRID; line <= 64; line += GRID) {
+            server.runCommand(String.format(Locale.ROOT, "fill %d %d -64 %d %d 63 minecraft:gray_concrete", line, GROUND - 1, line, GROUND - 1));
+            server.runCommand(String.format(Locale.ROOT, "fill -64 %d %d 63 %d %d minecraft:gray_concrete", GROUND - 1, line, GROUND - 1, line));
+        }
+        String[] colors = {
+            "red", "orange", "yellow", "lime", "cyan", "blue", "purple", "magenta", "pink", "white", "brown", "black",
+        };
+        for (int i = 0; i < colors.length; i++) {
+            double angle = Math.toRadians(360.0 * i / colors.length);
+            int x = (int) Math.round(PILLAR_RADIUS * Math.sin(angle));
+            int z = (int) Math.round(PILLAR_RADIUS * Math.cos(angle));
+            server.runCommand(String.format(Locale.ROOT, "fill %d %d %d %d %d %d minecraft:%s_concrete",
+                x - 1, GROUND, z - 1, x + 1, GROUND + PILLAR_HEIGHT, z + 1, colors[i]));
         }
     }
 
@@ -122,7 +149,7 @@ public class PlayerIconsRecordings implements FabricClientGameTest {
 
         Recorder recorder = new Recorder(context, server, "screen-edge");
         recorder.frames(15);
-        int turnTicks = 170;
+        int turnTicks = 110;
         for (int i = 1; i <= turnTicks; i++) {
             float t = (float) i / turnTicks;
             // eases in and out
