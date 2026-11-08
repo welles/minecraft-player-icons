@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "playericons-recordings",
+  "version": "1.0.0",
+  "name": "Player Icons recordings",
+  "description": "Plays scenes of Player Icons in a client game test and saves every frame, to make GIFs of the mod in action.",
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "dev.welles.playericons.recordings.PlayerIconsRecordings"
+    ]
+  },
+  "depends": {
+    "playericons": "*"
+  }
+}

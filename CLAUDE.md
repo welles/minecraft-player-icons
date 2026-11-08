@@ -23,6 +23,23 @@ the same commit as the README and tell the user to paste it into CurseForge.
 - Write it for players: what the mod does, how to install it, what can be configured; no build instructions.
 - Keep every paragraph and list item on a single line, since the CurseForge editor may turn line breaks into breaks.
 
+## Recordings
+
+The GIFs in `media/` show the mod in action, one feature each, and are embedded in the README and the CurseForge
+description. They are recorded by the client game test in `src/gametest/` (only on the 1.21.11-fabric node, not part of
+the mod jar), which plays each scene in a headless Minecraft without sound and saves every tick as a frame:
+
+    nix-shell --run scripts/record-gifs.sh
+
+The other players are bots on the integrated server (`BotConnection`), which is why the game test's network
+synchronizer is disabled. Record the GIFs again and check a few frames whenever a change affects what the scenes show
+(faces, labels, fading, the edge of the screen, the toggle message). Taking a screenshot advances the game by one tick,
+so one frame is one tick.
+
+Every GIF must be at most 2 MB (2,000,000 bytes), CurseForge does not accept larger ones. The script picks the best
+frame rate and palette that fit and fails otherwise; then shorten the scene or split it into one more GIF rather than
+lowering the limit.
+
 ## Testing in multiplayer
 
 The mod only does something with at least two players. `scripts/test-multiplayer.sh [node]` starts a local server and
